@@ -8,6 +8,10 @@ require('dotenv').config();
 // Import routes
 const urlRoutes = require('./src/routes/urls');
 
+// Import redirect controller and middleware
+const { validateShortCode } = require('./src/middleware/validateShortCode');
+const { redirectToOriginalUrl } = require('./src/controllers/urlController');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -21,6 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 // Mount API routes
 app.use('/api/urls', urlRoutes);
 
+// Redirect route (must be after API routes but before 404 handler)
+app.get('/:shortCode', validateShortCode, redirectToOriginalUrl);
+
 // Basic route
 app.get('/', (req, res) => {
   res.json({
@@ -29,6 +36,8 @@ app.get('/', (req, res) => {
     status: 'running',
     endpoints: {
       'POST /api/urls/shorten': 'Create a short URL',
+      'GET /api/urls/shorten/:shortCode': 'Get original URL data',
+      'GET /:shortCode': 'Redirect to original URL',
       'GET /health': 'Health check'
     }
   });

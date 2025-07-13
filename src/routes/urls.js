@@ -7,7 +7,8 @@ const router = express.Router();
 
 // Import middleware and controllers
 const { validateUrl } = require('../middleware/validateUrl');
-const { createShortUrl } = require('../controllers/urlController');
+const { validateShortCode } = require('../middleware/validateShortCode');
+const { createShortUrl, getOriginalUrl } = require('../controllers/urlController');
 
 /**
  * POST /shorten
@@ -34,6 +35,27 @@ const { createShortUrl } = require('../controllers/urlController');
  * }
  */
 router.post('/shorten', validateUrl, createShortUrl);
+
+/**
+ * GET /shorten/:shortCode
+ * Retrieves the original URL for a short code
+ * 
+ * Response:
+ * {
+ *   "success": true,
+ *   "data": {
+ *     "id": 1,
+ *     "url": "https://example.com",
+ *     "shortCode": "abc123",
+ *     "shortUrl": "http://localhost:3000/abc123",
+ *     "createdAt": "2025-07-13T10:30:00.000Z",
+ *     "updatedAt": "2025-07-13T10:30:00.000Z",
+ *     "accessCount": 5
+ *   },
+ *   "message": "Short URL retrieved successfully"
+ * }
+ */
+router.get('/shorten/:shortCode', validateShortCode, getOriginalUrl);
 
 /**
  * GET /
