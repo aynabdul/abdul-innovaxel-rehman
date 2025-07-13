@@ -37,6 +37,8 @@ app.get('/', (req, res) => {
     endpoints: {
       'POST /api/urls/shorten': 'Create a short URL',
       'GET /api/urls/shorten/:shortCode': 'Get original URL data',
+      'PUT /api/urls/shorten/:shortCode': 'Update URL',
+      'DELETE /api/urls/shorten/:shortCode': 'Delete URL',
       'GET /:shortCode': 'Redirect to original URL',
       'GET /health': 'Health check'
     }

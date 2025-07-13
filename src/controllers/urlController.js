@@ -258,9 +258,155 @@ const redirectToOriginalUrl = async (req, res) => {
   }
 };
 
+/**
+ * Updates an existing shortened URL
+ * 
+ * PUT /shorten/:shortCode
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const updateShortUrl = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+    const { url } = req.body; // URL has already been validated by middleware
+
+    console.log(`Updating short URL ${shortCode} with new URL: ${url}`);
+
+    // Check if the short code exists
+    const selectQuery = `
+      SELECT id, url, shortCode, createdAt, updatedAt, accessCount 
+      FROM urls 
+      WHERE shortCode = ?
+    `;
+    
+    const results = await executeQuery(selectQuery, [shortCode]);
+    
+    if (results.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Short URL not found',
+        message: `No short URL found with code: ${shortCode}`
+      });
+    }
+
+    // Update the URL and timestamp
+    const updateQuery = `
+      UPDATE urls 
+      SET url = ?, updatedAt = NOW() 
+      WHERE shortCode = ?
+    `;
+    
+    await executeQuery(updateQuery, [url, shortCode]);
+
+    // Get the updated record
+    const updatedResults = await executeQuery(selectQuery, [shortCode]);
+    const updatedUrl = updatedResults[0];
+
+    console.log(`Successfully updated short URL: ${shortCode}`);
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      data: {
+        id: updatedUrl.id,
+        url: updatedUrl.url,
+        shortCode: updatedUrl.shortCode,
+        shortUrl: `${process.env.BASE_URL}/${updatedUrl.shortCode}`,
+        createdAt: updatedUrl.createdAt,
+        updatedAt: updatedUrl.updatedAt,
+        accessCount: updatedUrl.accessCount
+      },
+      message: 'Short URL updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Error updating short URL:', error);
+
+    // Handle database errors
+    if (error.message.includes('Database error')) {
+      return res.status(500).json({
+        success: false,
+        error: 'Database error',
+        message: 'A database error occurred while updating the short URL.'
+      });
+    }
+
+    // Generic error response
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'An unexpected error occurred while updating the short URL.'
+    });
+  }
+};
+
+/**
+ * Deletes an existing shortened URL
+ * 
+ * DELETE /shorten/:shortCode
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const deleteShortUrl = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+
+    console.log(`Deleting short URL: ${shortCode}`);
+
+    // Check if the short code exists before deletion
+    const selectQuery = `
+      SELECT id, url, shortCode 
+      FROM urls 
+      WHERE shortCode = ?
+    `;
+    
+    const results = await executeQuery(selectQuery, [shortCode]);
+    
+    if (results.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Short URL not found',
+        message: `No short URL found with code: ${shortCode}`
+      });
+    }
+
+    // Delete the record
+    const deleteQuery = 'DELETE FROM urls WHERE shortCode = ?';
+    await executeQuery(deleteQuery, [shortCode]);
+
+    console.log(`Successfully deleted short URL: ${shortCode}`);
+
+    // Return 204 No Content (success with no response body)
+    res.status(204).send();
+
+  } catch (error) {
+    console.error('Error deleting short URL:', error);
+
+    // Handle database errors
+    if (error.message.includes('Database error')) {
+      return res.status(500).json({
+        success: false,
+        error: 'Database error',
+        message: 'A database error occurred while deleting the short URL.'
+      });
+    }
+
+    // Generic error response
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'An unexpected error occurred while deleting the short URL.'
+    });
+  }
+};
+
 module.exports = {
   createShortUrl,
   getOriginalUrl,
   redirectToOriginalUrl,
+  updateShortUrl,
+  deleteShortUrl,
   checkShortCodeExists
 };
