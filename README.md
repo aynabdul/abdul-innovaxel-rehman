@@ -55,7 +55,7 @@ A simple RESTful API that allows users to shorten long URLs with full CRUD opera
 
 5. Set up the MySQL database:
    - Create a database named `url_shortener`
-   - Run the SQL scripts in the `database/` directory
+   - Run the SQL scripts in the `src/database/` directory
 
 6. Start the development server:
    ```bash
@@ -63,25 +63,70 @@ A simple RESTful API that allows users to shorten long URLs with full CRUD opera
    ```
 
 The API will be available at `http://localhost:3000`
+The Frontend will be available at `http://localhost:3000` (same URL)
+
+## Frontend Interface
+
+The application includes a comprehensive web interface built with HTML, Tailwind CSS, and JavaScript that allows you to:
+
+- **Create Short URLs**: Enter a long URL and get a shortened version
+- **Retrieve URL Details**: View information about a short URL using its code
+- **Update URLs**: Modify the destination of an existing short URL
+- **View Statistics**: See access counts and other metrics for short URLs
+- **Delete URLs**: Remove short URLs from the system
+- **Test Redirects**: Test the redirect functionality in a new tab
+
+### Frontend Features
+
+- ✨ Clean, responsive design with Tailwind CSS
+- 🔄 Real-time loading states and animations
+- ✅ Comprehensive error handling and user feedback
+- 📱 Mobile-friendly responsive layout
+- ⌨️ Keyboard shortcuts (Enter key support)
+- 🎨 Color-coded sections for different operations
 
 ## API Endpoints
 
 ### Create Short URL
-- **POST** `/api/urls`
+- **POST** `/api/urls/shorten`
 - **Body**: `{ "originalUrl": "https://example.com" }`
 
-### Get Original URL
-- **GET** `/api/urls/:shortCode`
+### Get Original URL Data
+- **GET** `/api/urls/shorten/:shortCode`
 
 ### Update URL
-- **PUT** `/api/urls/:shortCode`
+- **PUT** `/api/urls/shorten/:shortCode`
 - **Body**: `{ "originalUrl": "https://new-example.com" }`
 
 ### Delete URL
-- **DELETE** `/api/urls/:shortCode`
+- **DELETE** `/api/urls/shorten/:shortCode`
 
 ### Get Statistics
-- **GET** `/api/urls/:shortCode/stats`
+- **GET** `/api/urls/stats/:shortCode`
+
+### Redirect to Original URL
+- **GET** `/:shortCode` (redirects to original URL and increments access count)
+
+## Testing Scripts
+
+The project includes several testing scripts:
+
+```bash
+# Test database connection
+npm run test-db
+
+# Test all API endpoints
+npm run test-api
+
+# Test CRUD operations
+npm run test-crud
+
+# Test statistics endpoint
+npm run test-stats
+
+# Open frontend in browser
+npm run open-frontend
+```
 
 ## Development
 
