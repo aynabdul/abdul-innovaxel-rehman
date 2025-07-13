@@ -1,145 +1,168 @@
 # URL Shortener API
 
-A simple RESTful API that allows users to shorten long URLs with full CRUD operations and access statistics.
+A full-stack URL shortening service with REST API and web interface. Create, manage, and track shortened URLs with complete CRUD operations and analytics.
 
-## Features
+## 🚀 Quick Start
 
-- **Create**: Generate short URLs from long URLs
-- **Retrieve**: Get original URLs from short codes
-- **Update**: Modify existing URL mappings
-- **Delete**: Remove URL mappings
-- **Statistics**: Track access counts for shortened URLs
+```bash
+# Clone and setup
+git clone https://github.com/aynabdul/abdul-innovaxel-rehman.git
+cd URL-shortner
+npm install
 
-## Tech Stack
+# Configure database
+# Create .env file (see configuration below)
+# Create MySQL database: url_shortener
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
+# Start server
+npm start
+# API: http://localhost:3000/api/urls
+# Frontend: http://localhost:3000
+```
+
+## 📋 Features
+
+- **REST API**: Full CRUD operations for URL management
+- **Web Interface**: Complete frontend with forms and real-time feedback
+- **Analytics**: Track access counts and usage statistics
+- **Validation**: URL format validation and duplicate handling
+- **Redirect**: Automatic redirect with access count tracking
+
+## 🛠️ Tech Stack
+
+- **Backend**: Node.js, Express.js, MySQL
+- **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript
 - **Database**: MySQL
-- **Environment**: dotenv for configuration
+- **Environment**: dotenv configuration
 
-## Setup Instructions
+## ⚙️ Configuration
 
-### Prerequisites
+Create `.env` file:
+```env
+PORT=3000
+DB_HOST=localhost
+DB_USER=your_username
+DB_PASSWORD=your_password
+DB_NAME=url_shortener
+BASE_URL=http://localhost:3000
+```
 
-- Node.js (v14 or higher)
-- MySQL Server
-- Git
+**Database Setup:**
+```sql
+CREATE DATABASE url_shortener;
+-- Table creation is handled automatically by the application
+```
 
-### Installation
+## 🔗 API Endpoints
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/aynabdul/abdul-innovaxel-rehman.git
-   cd URL-shortner
-   ```
+| Method | Endpoint | Description | Body |
+|--------|----------|-------------|------|
+| `POST` | `/api/urls/shorten` | Create short URL | `{"url": "https://example.com"}` |
+| `GET` | `/api/urls/shorten/:code` | Get URL details | - |
+| `PUT` | `/api/urls/shorten/:code` | Update URL | `{"url": "https://new-url.com"}` |
+| `DELETE` | `/api/urls/shorten/:code` | Delete URL | - |
+| `GET` | `/api/urls/stats/:code` | Get statistics | - |
+| `GET` | `/:code` | Redirect to original | - |
 
-2. Switch to the development branch:
-   ```bash
-   git checkout dev
-   ```
+**Response Format:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "url": "https://example.com",
+    "shortCode": "abc123",
+    "shortUrl": "http://localhost:3000/abc123",
+    "accessCount": 5,
+    "createdAt": "2025-01-13T10:30:00Z",
+    "updatedAt": "2025-01-13T10:30:00Z"
+  },
+  "message": "Operation successful"
+}
+```
 
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
+## 🖥️ Frontend Interface
 
-4. Create a `.env` file in the root directory:
-   ```env
-   PORT=3000
-   DB_HOST=localhost
-   DB_USER=your_db_user
-   DB_PASSWORD=your_db_password
-   DB_NAME=url_shortener
-   BASE_URL=http://localhost:3000
-   ```
+Access the web interface at `http://localhost:3000`:
 
-5. Set up the MySQL database:
-   - Create a database named `url_shortener`
-   - Run the SQL scripts in the `src/database/` directory
+- **Create URLs**: Enter long URLs to generate short codes
+- **Manage URLs**: Retrieve, update, and delete existing URLs
+- **View Analytics**: Track access counts and usage statistics
+- **Test Redirects**: Verify redirect functionality
 
-6. Start the development server:
-   ```bash
-   npm run dev
-   ```
+## 📝 Testing with Postman
 
-The API will be available at `http://localhost:3000`
-The Frontend will be available at `http://localhost:3000` (same URL)
+**Base URL:** `http://localhost:3000`
 
-## Frontend Interface
+**1. Create Short URL:**
+- **Method:** `POST`
+- **URL:** `http://localhost:3000/api/urls/shorten`
+- **Headers:** `Content-Type: application/json`
+- **Body (raw JSON):**
+```json
+{
+  "url": "https://www.google.com"
+}
+```
 
-The application includes a comprehensive web interface built with HTML, Tailwind CSS, and JavaScript that allows you to:
+**2. Get URL Details:**
+- **Method:** `GET`
+- **URL:** `http://localhost:3000/api/urls/shorten/abc123`
 
-- **Create Short URLs**: Enter a long URL and get a shortened version
-- **Retrieve URL Details**: View information about a short URL using its code
-- **Update URLs**: Modify the destination of an existing short URL
-- **View Statistics**: See access counts and other metrics for short URLs
-- **Delete URLs**: Remove short URLs from the system
-- **Test Redirects**: Test the redirect functionality in a new tab
+**3. Update URL:**
+- **Method:** `PUT`
+- **URL:** `http://localhost:3000/api/urls/shorten/abc123`
+- **Headers:** `Content-Type: application/json`
+- **Body (raw JSON):**
+```json
+{
+  "url": "https://www.github.com"
+}
+```
 
-### Frontend Features
+**4. Get Statistics:**
+- **Method:** `GET`
+- **URL:** `http://localhost:3000/api/urls/stats/abc123`
 
-- ✨ Clean, responsive design with Tailwind CSS
-- 🔄 Real-time loading states and animations
-- ✅ Comprehensive error handling and user feedback
-- 📱 Mobile-friendly responsive layout
-- ⌨️ Keyboard shortcuts (Enter key support)
-- 🎨 Color-coded sections for different operations
+**5. Delete URL:**
+- **Method:** `DELETE`
+- **URL:** `http://localhost:3000/api/urls/shorten/abc123`
 
-## API Endpoints
+**6. Test Redirect:**
+- **Method:** `GET`
+- **URL:** `http://localhost:3000/abc123`
 
-### Create Short URL
-- **POST** `/api/urls/shorten`
-- **Body**: `{ "originalUrl": "https://example.com" }`
+## 🗂️ Project Structure
 
-### Get Original URL Data
-- **GET** `/api/urls/shorten/:shortCode`
+```
+URL-shortner/
+├── index.js              # Main server entry point
+├── package.json           # Dependencies and scripts
+├── .env                  # Environment configuration
+├── public/
+│   └── index.html        # Frontend interface
+└── src/
+    ├── controllers/      # Business logic
+    ├── routes/          # API route definitions
+    ├── middleware/      # Validation middleware
+    ├── config/          # Database configuration
+    ├── utils/           # Utility functions
+    └── database/        # Database scripts
+```
 
-### Update URL
-- **PUT** `/api/urls/shorten/:shortCode`
-- **Body**: `{ "originalUrl": "https://new-example.com" }`
-
-### Delete URL
-- **DELETE** `/api/urls/shorten/:shortCode`
-
-### Get Statistics
-- **GET** `/api/urls/stats/:shortCode`
-
-### Redirect to Original URL
-- **GET** `/:shortCode` (redirects to original URL and increments access count)
-
-## Testing Scripts
-
-The project includes several testing scripts:
+## 🧪 Testing
 
 ```bash
 # Test database connection
 npm run test-db
 
-# Test all API endpoints
-npm run test-api
-
-# Test CRUD operations
-npm run test-crud
-
-# Test statistics endpoint
-npm run test-stats
-
-# Open frontend in browser
-npm run open-frontend
+# Manual testing via web interface
+npm start
+# Visit: http://localhost:3000
 ```
 
-## Development
+## 🤝 Development
 
-- **Main Branch**: Contains only documentation and setup instructions
-- **Dev Branch**: Contains all source code and development work
+- **Main Branch**: Documentation only
+- **Dev Branch**: Source code and development
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch from `dev`
-3. Make your changes
-4. Submit a pull request to the `dev` branch
-
-## License
-
-This project is licensed under the MIT License.
