@@ -2,8 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const { initDatabase, closeConnections } = require('./config/database');
+const { initDatabase, closeConnections } = require('./src/config/database');
 require('dotenv').config();
+
+// Import routes
+const urlRoutes = require('./src/routes/urls');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,12 +18,19 @@ app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Mount API routes
+app.use('/api/urls', urlRoutes);
+
 // Basic route
 app.get('/', (req, res) => {
   res.json({
     message: 'URL Shortener API',
     version: '1.0.0',
-    status: 'running'
+    status: 'running',
+    endpoints: {
+      'POST /api/urls/shorten': 'Create a short URL',
+      'GET /health': 'Health check'
+    }
   });
 });
 
