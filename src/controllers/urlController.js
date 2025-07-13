@@ -402,11 +402,90 @@ const deleteShortUrl = async (req, res) => {
   }
 };
 
+/**
+ * Gets statistics for a shortened URL
+ * 
+ * GET /stats/:shortCode
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getUrlStats = async (req, res) => {
+  try {
+    const { shortCode } = req.params; // Already validated by middleware
+
+    console.log(`Getting statistics for short code: ${shortCode}`);
+
+    // Query the database for the URL with the given short code
+    const query = `
+      SELECT id, url, shortCode, createdAt, updatedAt, accessCount 
+      FROM urls 
+      WHERE shortCode = ? 
+      LIMIT 1
+    `;
+    
+    const results = await executeQuery(query, [shortCode]);
+
+    if (results.length === 0) {
+      console.log(`Short code not found: ${shortCode}`);
+      return res.status(404).json({
+        success: false,
+        error: 'Short URL not found',
+        message: `No URL found with short code: ${shortCode}`
+      });
+    }
+
+    const urlData = results[0];
+
+    console.log(`Statistics retrieved for short code: ${shortCode}, access count: ${urlData.accessCount}`);
+
+    // Return success response with statistics
+    res.status(200).json({
+      success: true,
+      data: {
+        id: urlData.id,
+        url: urlData.url,
+        shortCode: urlData.shortCode,
+        shortUrl: `${process.env.BASE_URL}/${urlData.shortCode}`,
+        createdAt: urlData.createdAt,
+        updatedAt: urlData.updatedAt,
+        accessCount: urlData.accessCount,
+        statistics: {
+          totalAccesses: urlData.accessCount,
+          createdDaysAgo: Math.floor((new Date() - new Date(urlData.createdAt)) / (1000 * 60 * 60 * 24)),
+          lastUpdated: urlData.updatedAt
+        }
+      },
+      message: 'URL statistics retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Error getting URL statistics:', error);
+
+    // Handle database errors
+    if (error.message.includes('Database error')) {
+      return res.status(500).json({
+        success: false,
+        error: 'Database error',
+        message: 'A database error occurred while retrieving URL statistics.'
+      });
+    }
+
+    // Generic error response
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'An unexpected error occurred while retrieving URL statistics.'
+    });
+  }
+};
+
 module.exports = {
   createShortUrl,
   getOriginalUrl,
   redirectToOriginalUrl,
   updateShortUrl,
   deleteShortUrl,
+  getUrlStats,
   checkShortCodeExists
 };

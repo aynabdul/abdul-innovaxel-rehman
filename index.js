@@ -39,6 +39,7 @@ app.get('/', (req, res) => {
       'GET /api/urls/shorten/:shortCode': 'Get original URL data',
       'PUT /api/urls/shorten/:shortCode': 'Update URL',
       'DELETE /api/urls/shorten/:shortCode': 'Delete URL',
+      'GET /api/urls/stats/:shortCode': 'Get URL statistics',
       'GET /:shortCode': 'Redirect to original URL',
       'GET /health': 'Health check'
     }

@@ -8,7 +8,7 @@ const router = express.Router();
 // Import middleware and controllers
 const { validateUrl } = require('../middleware/validateUrl');
 const { validateShortCode } = require('../middleware/validateShortCode');
-const { createShortUrl, getOriginalUrl, updateShortUrl, deleteShortUrl } = require('../controllers/urlController');
+const { createShortUrl, getOriginalUrl, updateShortUrl, deleteShortUrl, getUrlStats } = require('../controllers/urlController');
 
 /**
  * POST /shorten
@@ -98,6 +98,32 @@ router.put('/shorten/:shortCode', validateShortCode, validateUrl, updateShortUrl
 router.delete('/shorten/:shortCode', validateShortCode, deleteShortUrl);
 
 /**
+ * GET /stats/:shortCode
+ * Gets statistics for a shortened URL
+ * 
+ * Response:
+ * {
+ *   "success": true,
+ *   "data": {
+ *     "id": 1,
+ *     "url": "https://example.com",
+ *     "shortCode": "abc123",
+ *     "shortUrl": "http://localhost:3000/abc123",
+ *     "createdAt": "2025-07-13T10:30:00.000Z",
+ *     "updatedAt": "2025-07-13T10:30:00.000Z",
+ *     "accessCount": 5,
+ *     "statistics": {
+ *       "totalAccesses": 5,
+ *       "createdDaysAgo": 2,
+ *       "lastUpdated": "2025-07-13T10:30:00.000Z"
+ *     }
+ *   },
+ *   "message": "URL statistics retrieved successfully"
+ * }
+ */
+router.get('/stats/:shortCode', validateShortCode, getUrlStats);
+
+/**
  * GET /
  * API information endpoint
  */
@@ -111,7 +137,7 @@ router.get('/', (req, res) => {
       'GET /api/urls/shorten/:shortCode': 'Get original URL data',
       'PUT /api/urls/shorten/:shortCode': 'Update URL',
       'DELETE /api/urls/shorten/:shortCode': 'Delete URL',
-      'GET /api/urls/:shortCode/stats': 'Get URL statistics (coming soon)'
+      'GET /api/urls/stats/:shortCode': 'Get URL statistics'
     }
   });
 });
